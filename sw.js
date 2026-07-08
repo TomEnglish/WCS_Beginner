@@ -1,5 +1,5 @@
 /* WCS Cards — service worker (offline app shell) */
-const CACHE = "wcs-cards-v1";
+const CACHE = "wcs-cards-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -30,6 +30,17 @@ self.addEventListener("fetch", (e) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // let cross-origin (YouTube etc.) hit the network
+  if (req.mode === "navigate") {
+    // network-first for the page itself so updates arrive without a version bump
+    e.respondWith(
+      fetch(req).then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put("./index.html", copy));
+        return res;
+      }).catch(() => caches.match("./index.html"))
+    );
+    return;
+  }
   e.respondWith(
     caches.match(req).then((hit) =>
       hit ||
@@ -37,7 +48,7 @@ self.addEventListener("fetch", (e) => {
         const copy = res.clone();
         caches.open(CACHE).then((c) => c.put(req, copy));
         return res;
-      }).catch(() => (req.mode === "navigate" ? caches.match("./index.html") : undefined))
+      }).catch(() => undefined)
     )
   );
 });
