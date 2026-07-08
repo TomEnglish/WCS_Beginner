@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="theme-color" content="#1f1147" />
+<title>WCS Beginner Moves — Lead Flip Cards</title>
+<style>
+  :root{
+    --bg1:#1f1147; --bg2:#3a1c71; --bg3:#5b2a86;
+    --card:#ffffff; --ink:#1a1330; --muted:#6b6580;
+    --accentL:#0ea5a5;   /* left foot  */
+    --accentR:#f2617a;   /* right foot */
+    --gold:#ffd166;
+    --core:#0ea5a5; --plus:#f59e0b;
+    --line:#e7e3f0;
+    --shadow:0 18px 40px rgba(0,0,0,.35);
+    --radius:22px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:#fff;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2) 55%,var(--bg3));
+    background-attachment:fixed;
+    display:flex; flex-direction:column; align-items:center;
+    min-height:100dvh; padding:10px 12px calc(12px + env(safe-area-inset-bottom));
+  }
+  .wrap{width:100%; max-width:440px; display:flex; flex-direction:column; flex:1; min-height:0}
+  header{padding:6px 2px 8px; text-align:center}
+  h1{font-size:1.12rem; margin:0; letter-spacing:.3px; font-weight:800}
+  .sub{font-size:.72rem; opacity:.75; margin-top:2px}
+
+  .bar{display:flex; align-items:center; gap:8px; margin:6px 0 10px}
+  .progress{flex:1; height:8px; border-radius:99px; background:rgba(255,255,255,.16); overflow:hidden}
+  .progress > i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--gold),#ff9e6d); transition:width .35s ease}
+  .count{font-size:.72rem; opacity:.85; min-width:42px; text-align:right; font-variant-numeric:tabular-nums}
+  .chip{border:none; cursor:pointer; font-weight:700; font-size:.72rem; color:#fff;
+    background:rgba(255,255,255,.14); padding:7px 10px; border-radius:99px; display:flex; align-items:center; gap:5px}
+  .chip:active{transform:scale(.96)}
+  .chip.on{background:var(--gold); color:#3a1c71}
+  .filters{display:flex; gap:6px; justify-content:center; margin-bottom:10px; flex-wrap:wrap}
+
+  .stage{perspective:1600px; flex:1; min-height:0; display:flex}
+  .card{position:relative; width:100%; transform-style:preserve-3d; transition:transform .5s cubic-bezier(.2,.7,.2,1);
+    border-radius:var(--radius); cursor:pointer}
+  .card.flipped{transform:rotateY(180deg)}
+  .face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    background:var(--card); color:var(--ink); border-radius:var(--radius); box-shadow:var(--shadow);
+    display:flex; flex-direction:column; overflow:hidden}
+  .back{transform:rotateY(180deg)}
+  .spacer{visibility:hidden; width:100%}
+  .face-inner{padding:15px 16px; display:flex; flex-direction:column; height:100%; overflow:auto}
+
+  .topline{display:flex; align-items:center; gap:8px}
+  .num{font-size:.72rem; font-weight:800; color:#fff; background:var(--bg2); border-radius:99px; padding:3px 9px}
+  .badge{font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.5px; padding:3px 8px; border-radius:99px; color:#fff}
+  .badge.core{background:var(--core)} .badge.plus{background:var(--plus)}
+  .fam{margin-left:auto; font-size:.66rem; color:var(--muted); font-weight:700}
+
+  .name{font-size:1.32rem; font-weight:800; margin:9px 0 1px; line-height:1.12}
+  .aka{font-size:.78rem; color:var(--muted); margin-bottom:2px}
+  .timing{display:inline-flex; align-items:center; gap:8px; margin-top:7px; font-weight:700; font-size:.8rem; color:var(--bg2)}
+  .timing b{background:#f3eefb; color:var(--bg2); padding:3px 9px; border-radius:8px; font-variant-numeric:tabular-nums}
+
+  .diagram{margin:8px 0 4px; display:flex; justify-content:center}
+  .diagram svg{width:100%; max-width:270px; height:auto}
+
+  .foot-note{font-size:.82rem; line-height:1.4; color:#2c2542; background:#f7f5fc; border:1px solid var(--line);
+    border-radius:12px; padding:9px 11px; margin-top:auto}
+  .foot-note .lab{display:block; font-size:.62rem; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:800; margin-bottom:3px}
+  .hint{text-align:center; font-size:.68rem; color:var(--muted); margin-top:9px}
+  .hint b{color:var(--bg3)}
+
+  .sec{margin-bottom:11px}
+  .sec .lab{font-size:.62rem; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:800; margin-bottom:4px; display:flex; align-items:center; gap:6px}
+  .sec p{margin:0; font-size:.86rem; line-height:1.46}
+  .cue{background:linear-gradient(120deg,#fff6db,#ffe9c7); border:1px solid #ffe0a3; border-radius:12px; padding:9px 11px; font-weight:600; font-size:.86rem; color:#6b4b00}
+  .links{display:flex; flex-direction:column; gap:8px; margin-top:auto}
+  a.btn{display:flex; align-items:center; gap:9px; text-decoration:none; font-weight:700; font-size:.84rem;
+    padding:11px 13px; border-radius:12px; border:1px solid var(--line); color:var(--ink); background:#fbfaff}
+  a.btn:active{transform:scale(.99)}
+  a.btn .ic{width:22px; height:22px; flex:0 0 22px; display:grid; place-items:center; border-radius:6px; color:#fff; font-size:.7rem}
+  a.btn.vid .ic{background:#ff0033} a.btn.ref .ic{background:var(--bg2)}
+  a.btn small{display:block; color:var(--muted); font-weight:600; font-size:.68rem}
+  .learn{display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; font-weight:800; font-size:.8rem;
+    border:none; cursor:pointer; padding:11px; border-radius:12px; background:#eef7f2; color:#0d7a5f}
+  .learn.done{background:#0ea5a5; color:#fff}
+
+  nav{display:flex; align-items:center; gap:10px; margin-top:12px}
+  .nav-btn{flex:1; border:none; cursor:pointer; font-weight:800; font-size:.9rem; color:#fff;
+    background:rgba(255,255,255,.14); padding:14px; border-radius:14px; display:flex; align-items:center; justify-content:center; gap:7px}
+  .nav-btn:active{transform:scale(.97)}
+  .nav-btn.flip{flex:1.5; background:var(--gold); color:#3a1c71}
+  .legend{display:flex; gap:12px; justify-content:center; font-size:.64rem; opacity:.85; margin-top:9px; flex-wrap:wrap}
+  .legend span{display:inline-flex; align-items:center; gap:5px}
+  .dot{width:11px; height:11px; border-radius:50%}
+  footer{font-size:.6rem; opacity:.6; text-align:center; margin-top:9px; line-height:1.4}
+  @media (min-height:760px){ .name{font-size:1.48rem} .sec p{font-size:.9rem} }
+</style>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="WCS Cards" />
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>West Coast Swing — Beginner Moves</h1>
+    <div class="sub">20 lead patterns · tap the card to flip</div>
+  </header>
+
+  <div class="bar">
+    <button class="chip" id="shuffleBtn" title="Shuffle">🔀 Shuffle</button>
+    <div class="progress" aria-label="learned progress"><i id="progFill"></i></div>
+    <div class="count" id="counter">1 / 20</div>
+  </div>
+  <div class="filters">
+    <button class="chip on" data-filter="all">All 20</button>
+    <button class="chip" data-filter="Core">Core</button>
+    <button class="chip" data-filter="Beginner+">Beginner+</button>
+    <button class="chip" data-filter="learned">★ Learned</button>
+  </div>
+
+  <div class="stage">
+    <div class="card" id="card">
+      <div class="spacer" id="spacer"></div>
+      <div class="face front" id="front"></div>
+      <div class="face back" id="back"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i class="dot" style="background:var(--accentL)"></i> Left foot</span>
+    <span><i class="dot" style="background:var(--accentR)"></i> Right foot</span>
+    <span><i class="dot" style="background:#b9b3c9"></i> Follower path</span>
+  </div>
+
+  <nav>
+    <button class="nav-btn" id="prevBtn">‹ Prev</button>
+    <button class="nav-btn flip" id="flipBtn">Flip ↻</button>
+    <button class="nav-btn" id="nextBtn">Next ›</button>
+  </nav>
+
+  <footer>
+    Diagrams are schematic memory aids (US convention: lead starts on the left foot). Footwork
+    conventions vary slightly by school — the linked video is the authority for exact technique.
+  </footer>
+</div>
+
+<script>
+/* ===========================================================================
+   DATA — 20 beginner West Coast Swing lead patterns
+   fam: diagram family (push | pass | whip) · travel: follower path style
+=========================================================================== */
+const V="https://www.youtube.com/watch?v=";
+const MOVES=[
+{n:1,name:"Starter Step",aka:"Open basic / 4-count rhythm break",level:"Core",fam:"push",travel:"inback",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Face your partner in open position. 1 — rock back on your LEFT. 2 — replace forward onto your RIGHT. 3&4 — triple in place (L-R-L). 5&6 — anchor (R-L-R), weight settling back. It sets the pulse and connection before you send her out.",
+ hands:"Hand-to-hand (your left holds her right), palm softly cupped — no grip. Keep the elbow weighted slightly back so she feels a steady, elastic 'stretch.' Everything else is led from this connection.",
+ cue:"Rock back, replace, triple, anchor — establish the pulse.",
+ vid:V+"WHk1qylcQzQ",vidT:"WCS Basic Steps: Starter Step & Left Side Pass",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-for-beginners/",refT:"WCS Online — Beginner Guide"},
+
+{n:2,name:"Anchor Step",aka:"The universal ending",level:"Core",fam:"push",travel:"anchor",
+ count:"2 beats",timing:"5&6",
+ feet:"The triple that ends almost every pattern. 5&6 — triple in place (R-L-R), right foot back / left forward in a small stagger. You do NOT travel — you anchor and stretch away from your partner.",
+ hands:"Keep a light leverage (leaning-away) connection. Hand stays in front of your body; create the anchor's tension by moving your center back, never by pulling with the arm.",
+ cue:"Stay put and stretch back — never travel on the anchor.",
+ vid:V+"Mg9rgBxjCQg",vidT:"Anchor Step — West Coast Swing",
+ ref:"https://www.westcoastswingonline.com/category/anchor-step/",refT:"WCS Online — Anchor Step hub"},
+
+{n:3,name:"Sugar Push",aka:"Push break",level:"Core",fam:"push",travel:"inback",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"You stay at your end of the slot. 1 — step back LEFT. 2 — step back RIGHT (receiving her). 3&4 — triple forward (L-R-L) as you send her back. 5&6 — anchor (R-L-R). You barely travel.",
+ hands:"Two-hand or hand-to-hand hold. As she comes in on 3&4, give a soft 'wall' with your hands (compression — meet her, don't shove), then release so she rolls back out to her end. Keep both forearms toned.",
+ cue:"Meet her with a soft wall, send her back home.",
+ vid:V+"gYYYJNatVXQ",vidT:"How To WCS — Sugar Push",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-basic-patterns/",refT:"WCS Online — Basic Patterns"},
+
+{n:4,name:"Left Side Pass",aka:"Pass on the left",level:"Core",fam:"pass",travel:"down",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"1 — step back LEFT, opening the slot. 2 — step back/side RIGHT to clear the lane. 3&4 — triple (L-R-L) as she passes on your LEFT, rotating to follow her. 5&6 — anchor facing the new direction.",
+ hands:"Hand-to-hand. Lead her straight down the slot, keep your hand in your own centerline, and let her pass on your left — don't drag her across. Guide, then release into the anchor.",
+ cue:"Open the door, let her pass left, rotate, anchor.",
+ vid:V+"WwCDPCVcLMA",vidT:"WEST COAST SWING — Left Side Pass",
+ ref:"https://www.dancecentral.info/ballroom/club-dances/west-coast-swing/left-side-pass",refT:"Dance Central — Left Side Pass"},
+
+{n:5,name:"Right Side Pass",aka:"Pass on the right",level:"Core",fam:"pass",travel:"downR",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Mirror of the left side pass. 1 — step back. 2 — clear the slot to your right. 3&4 — triple as she passes on your RIGHT, rotating with her. 5&6 — anchor.",
+ hands:"Hand-to-hand. Lead her forward down the slot and let her travel past your right side. Keep the connection in front of your body — think 'send,' not 'pull.'",
+ cue:"Send her past your right side, rotate, anchor.",
+ vid:V+"dfVpwMLqm-o",vidT:"How to Dance WCS Basics — Sugar Push, Side Pass, Whip",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-basic-patterns/",refT:"WCS Online — Basic Patterns"},
+
+{n:6,name:"Underarm Turn",aka:"Right side pass w/ underarm turn",level:"Core",fam:"pass",travel:"downTurnCW",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Same footwork as a right side pass: 1 back, 2 clear, 3&4 triple, 5&6 anchor — you stay small while she turns.",
+ hands:"On 2–3, raise your leading hand into a smooth arch above her head (no yanking). She passes on your right and turns clockwise under the raised hand. Lower it gently for the anchor. Lead the turn early and keep the arch high enough to clear.",
+ cue:"Raise a soft arch — she spins by on your right.",
+ vid:V+"bSu7QJZ5SLU",vidT:"How to Do the Underarm Turn — Swing Dance",
+ ref:"https://www.howcast.com/videos/507298-how-to-do-the-underarm-turn-swing-dance/",refT:"Howcast — Underarm Turn"},
+
+{n:7,name:"Inside Roll",aka:"Left side pass w/ inside turn",level:"Core",fam:"pass",travel:"downTurnCCW",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Left-side-pass footwork: 1 back, 2 clear, 3&4 triple rotating with her, 5&6 anchor.",
+ hands:"As she leaves on 1–2, lead a left (inside) turn: bring your hand toward her shoulder line, then open — prompting her to roll toward you and turn counter-clockwise as she passes on your left. Lead her body first, the hand second; keep it low and connected.",
+ cue:"Roll her in on the left pass — turn is toward you.",
+ vid:V+"koIM1l49Aac",vidT:"WCS — Left Side Pass with Inside Turn / J-Hook",
+ ref:"https://www.westcoastswingonline.com/beginner-west-coast-swing-patterns/",refT:"WCS Online — Beginner Patterns"},
+
+{n:8,name:"Tuck Turn",aka:"Tuck & turn",level:"Core",fam:"push",travel:"inbackTurn",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"1 — step back LEFT. 2 — small step as you 'tuck' her. 3&4 — triple. 5&6 — anchor. You stay mostly in place.",
+ hands:"On 2, compress toward her and 'tuck' — a small check that turns her to face away — then on 3&4 lead her back down the slot and turn her (often under your raised hand) on 5&6. It's compress → redirect → release; never a yank.",
+ cue:"Tuck (compress), send, turn out.",
+ vid:V+"Pqwm_flRXkk",vidT:"WCS — 5 Basic Tuck Turns",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-basic-patterns/",refT:"WCS Online — Basic Patterns"},
+
+{n:9,name:"Sugar Tuck",aka:"Sugar push w/ a tuck",level:"Core",fam:"push",travel:"inbackTurn",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Like a sugar push you stay home: 1 back LEFT, 2 back RIGHT, 3&4 triple, 5&6 anchor.",
+ hands:"Bring her in like a sugar push, but on 4 add a small tuck that turns her away from you; she then rolls back under your arm to face you by the end of 5&6. Two-hand or single-hand — the tuck is a brief compression + turn of the hand, not a pull.",
+ cue:"Sugar push, but tuck her away and roll her back.",
+ vid:V+"UG75QnjhYVM",vidT:"Sugar Tuck — WCS Dance Tutorial",
+ ref:"https://www.dancecentral.info/ballroom/club-dances/west-coast-swing/sugar-tuck",refT:"Dance Central — Sugar Tuck"},
+
+{n:10,name:"Passing Tuck",aka:"Traveling tuck",level:"Core",fam:"pass",travel:"downTurnCW",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Side-pass footwork with travel: 1 back, 2 clear the slot, 3&4 triple as she tucks and passes, 5&6 anchor at the new position.",
+ hands:"As she travels down the slot, add a tuck (brief compression + turn) mid-pass so she turns while passing rather than staying at one end. Lead the tuck early and let her keep traveling — don't stall her.",
+ cue:"A tuck she travels through — turn on the pass.",
+ vid:"https://www.youtube.com/playlist?list=PLeZ__vwnEDu94OYgg4g0llDcZnL2NodiL",vidT:"WCS Beginner Patterns (playlist — Passing Tuck)",
+ ref:"https://www.westcoastswingonline.com/beginner-west-coast-swing-patterns/",refT:"WCS Online — Beginner Patterns"},
+
+{n:11,name:"Whip",aka:"The signature 8-count",level:"Core",fam:"whip",travel:"whip",
+ count:"8-count",timing:"1, 2, 3&4, 5, 6, 7&8",
+ feet:"The signature 8-count. Walk, walk, triple, walk, walk, triple. 1 — back LEFT. 2 — side/forward RIGHT bringing her in. 3&4 — triple (L-R-L) swapping her across. 5,6 — two walks rotating around her. 7&8 — anchor.",
+ hands:"Left-to-right or two-hand. On 1–2 bring her toward a near-closed position (your right hand can catch her back), lead her past, then redirect ('whip') her back to her end over 5–6, and settle the anchor. Body leads the whip; the hand finishes it.",
+ cue:"Bring her in, pass, whip her back — walk-walk, triple ×2.",
+ vid:V+"5vVeFs6q9os",vidT:"West Coast Swing Basic Whip",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-whip/",refT:"WCS Online — Whip footwork & timing"},
+
+{n:12,name:"Reverse Whip",aka:"Whip the other way",level:"Beginner+",fam:"whip",travel:"reverseWhip",
+ count:"8-count",timing:"1, 2, 3&4, 5, 6, 7&8",
+ feet:"Whip timing (walk, walk, triple, walk, walk, triple), but you rotate the opposite way (clockwise): 1–2 receive, 3&4 triple, 5–6 walk around the other direction, 7&8 anchor.",
+ hands:"Same catch as a whip, but you turn the whip the reverse direction so she's redirected on the opposite side. Keep your frame connected through the rotation and lead the new direction with your body early.",
+ cue:"A whip that rotates the other way.",
+ vid:V+"OLXJylMWZto",vidT:"The Reverse Whip for West Coast Swing",
+ ref:"https://www.westcoastswingonline.com/reverse-whip-series/",refT:"WCS Online — Reverse Whip"},
+
+{n:13,name:"Whip with Inside Turn",aka:"Whip + spin",level:"Beginner+",fam:"whip",travel:"whipTurn",
+ count:"8-count",timing:"1, 2, 3&4, 5, 6, 7&8",
+ feet:"Basic whip footwork: walk, walk, triple, walk, walk, triple.",
+ hands:"During the whip (around 5–6), raise your hand and lead her through an inside turn instead of a plain redirect. Time the arch with her rotation and re-catch for the anchor — give her the full two walking beats, don't rush it.",
+ cue:"A whip with a spin baked into the middle.",
+ vid:V+"eMUxDP0vOIA",vidT:"West Coast Swing — Whip, Inside Turn",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-whip/",refT:"WCS Online — Whip footwork & timing"},
+
+{n:14,name:"Basket Whip",aka:"Locked whip",level:"Beginner+",fam:"whip",travel:"whip",
+ count:"8-count",timing:"1, 2, 3&4, 5, 6, 7&8",
+ feet:"Whip timing. You may step slightly across to create the 'basket' wrap, then unwind for the anchor.",
+ hands:"Both hands stay joined and wrap into a 'basket' (arms cross/wrap) during the whip, then unwrap as she travels out. Lead the wrap smoothly and keep tone so the basket doesn't collapse.",
+ cue:"Wrap into a basket, unwrap on the way out.",
+ vid:V+"XrjWjMDHUTg",vidT:"The Basket Whip for West Coast Swing",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-whip/",refT:"WCS Online — Whip footwork & timing"},
+
+{n:15,name:"Rolling Side Pass",aka:"Roll off the arm",level:"Beginner+",fam:"pass",travel:"roll",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Side-pass footwork: 1 back, 2 clear, 3&4 triple, 5&6 anchor.",
+ hands:"As she passes, lead a continuous roll (about 1½ turns) so she 'rolls off' your hand/arm and ends on the far side of the slot. Keep the hand loose enough to let the rotation continue — lead the roll early and shed extra tension.",
+ cue:"She rolls off your arm to the other end.",
+ vid:V+"o10RKoM-1cE",vidT:"WCS Basics — incl. Rolling Side Pass",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-basics-part-2/",refT:"WCS Online — Basics Part 2"},
+
+{n:16,name:"Left Side Pass + Leader's Turn",aka:"Man's turn",level:"Beginner+",fam:"pass",travel:"downLeadTurn",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Left-side-pass footwork, but you add your own ½ turn: 1 back, 2 step, 3&4 triple while YOU turn (usually left), 5&6 anchor facing her again.",
+ hands:"Lead her down the slot as normal, then release just enough to turn yourself past the connection and re-catch for the anchor. Your turn must not tug her — rotate around a stable, quiet hand.",
+ cue:"She passes, YOU turn, re-catch, anchor.",
+ vid:V+"qrO1c9c8tNE",vidT:"WCS — Man's Left Turn from Left Side Pass",
+ ref:"https://www.dancecentral.info/ballroom/club-dances/west-coast-swing/left-side-pass",refT:"Dance Central — Left Side Pass"},
+
+{n:17,name:"Rotating Starter Step",aka:"Starter step variations",level:"Beginner+",fam:"push",travel:"inbackRotate",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Starter-step timing (rock, replace, triple, anchor) but you rotate the whole pattern to re-aim the slot — handy for changing where the slot points on a crowded floor.",
+ hands:"Keep a steady hand-to-hand and lead the rotation with your body while the hand stays quiet. Re-establish the stretch at the anchor before the next send.",
+ cue:"A starter step that re-aims the slot.",
+ vid:V+"nVaJrDlNB1A",vidT:"7 Starter Step Variations for WCS",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-for-beginners/",refT:"WCS Online — Beginner Guide"},
+
+{n:18,name:"Tuck Turn Sendout",aka:"Tuck → send",level:"Beginner+",fam:"pass",travel:"downTurnCW",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Tuck footwork ending in a send-out down the slot: rock, replace, triple, anchor — sending her away on the anchor's stretch.",
+ hands:"Combine the tuck (compress + turn) with a send-out: tuck her, then use the anchor's stretch to send her down the slot into the next pattern. Time the send with the '&' so she leaves on 1.",
+ cue:"Tuck, then send her out into the slot.",
+ vid:V+"KKQ5wubs8eU",vidT:"WCS — Starter Steps with Tuck Turn Sendout",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-basic-patterns/",refT:"WCS Online — Basic Patterns"},
+
+{n:19,name:"Whip with Underarm/Outside Turn",aka:"Turning whip",level:"Beginner+",fam:"whip",travel:"whipTurn",
+ count:"8-count",timing:"1, 2, 3&4, 5, 6, 7&8",
+ feet:"Whip timing: walk, walk, triple, walk, walk, triple.",
+ hands:"Instead of a plain redirect, lead an underarm or outside turn during the whip. Raise a clean arch (underarm) or lead her to turn away (outside) on 5–6, then anchor. Give the turn room and keep the anchor grounded.",
+ cue:"A whip finished with a turn — underarm or outside.",
+ vid:"https://www.youtube.com/playlist?list=PLeZ__vwnEDu8Lf_OAAuIhOHP5jK1UFBPF",vidT:"WCS Whip playlist (whip + turn variations)",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-whip/",refT:"WCS Online — Whip footwork & timing"},
+
+{n:20,name:"Sugar Push Variations",aka:"Dressing up the push",level:"Beginner+",fam:"push",travel:"inback",
+ count:"6-count",timing:"1, 2, 3&4, 5&6",
+ feet:"Sugar-push footwork: back, back, triple, anchor — you stay home.",
+ hands:"Once the basic push is solid, add syncopations or a hand change during the compression (switch hands on 3&4, or add a small tuck). Variations ride on top of a clean push — keep the 'soft wall' feeling.",
+ cue:"Dress up the push — hand changes & syncopations.",
+ vid:V+"49apCWSUGlM",vidT:"Sugar Push Variations for WCS — Beginner",
+ ref:"https://www.westcoastswingonline.com/west-coast-swing-basic-patterns/",refT:"WCS Online — Basic Patterns"}
+];
+
+/* ===========================================================================
+   FOOTWORK DIAGRAM — a labeled "foot ladder" (one row per beat) beside the
+   slot lane showing the follower's travel. Schematic memory aid.
+=========================================================================== */
+const STEPS={
+  push:[["1","L","back"],["2","R","back"],["3&4","LRL","forward"],["5&6","RLR","anchor"]],
+  pass:[["1","L","back"],["2","R","side"],["3&4","LRL","rotate"],["5&6","RLR","anchor"]],
+  whip:[["1","L","back"],["2","R","forward"],["3&4","LRL","cross"],["5,6","LR","walk"],["7&8","RLR","anchor"]],
+  anchor:[["5&6","RLR","stay"]]
+};
+const FOOTCOL={L:"var(--accentL)",R:"var(--accentR)"};
+const LANEX=150, LTOP=54, LBOT=224;
+
+function feetGlyph(code,cx,cy){
+  const feet=code.split("").filter(c=>c==="L"||c==="R");
+  const n=feet.length, dx=n>2?11:13, x0=cx-(n-1)*dx/2;
+  let s="";
+  feet.forEach((f,i)=>{
+    const x=(x0+i*dx).toFixed(1), big=n===1;
+    s+=`<g transform="translate(${x},${cy})">
+      <ellipse rx="${big?7:5.4}" ry="${big?10:8}" fill="${FOOTCOL[f]}"/>
+      <text y="3.1" text-anchor="middle" font-size="${big?8:6.6}" font-weight="800" fill="#fff">${f}</text></g>`;
+  });
+  return s;
+}
+function ladder(rows){
+  const rh=(LBOT-LTOP)/rows.length;
+  let s=`<text x="52" y="30" text-anchor="middle" font-size="8.6" font-weight="800" fill="#2c2542">YOUR FEET</text>`;
+  s+=`<line x1="66" y1="${LTOP-2}" x2="66" y2="${LBOT}" stroke="#efeaf8" stroke-width="11" stroke-linecap="round"/>`;
+  rows.forEach((r,i)=>{
+    const yc=LTOP+rh*i+rh/2;
+    const lbl=r[0].replace(/&/g,"&amp;");
+    s+=`<rect x="8" y="${(yc-8).toFixed(1)}" width="32" height="16" rx="8" fill="var(--bg2)"/>
+        <text x="24" y="${(yc+3.6).toFixed(1)}" text-anchor="middle" font-size="8.2" font-weight="800" fill="#fff">${lbl}</text>`;
+    s+=feetGlyph(r[1],66,yc);
+    s+=`<text x="86" y="${(yc+3).toFixed(1)}" font-size="7.6" fill="#8a83a3" font-weight="700">${r[2]}</text>`;
+  });
+  return s;
+}
+function travelPath(kind){
+  const A=' marker-end="url(#ah)"', X=LANEX;
+  const P=d=>`<path d="${d}" fill="none" stroke="#b9b3c9" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 7"${A}/>`;
+  const spin=(cy,cw)=>{const d=cw?`M ${X-10} ${cy-3} A 10 10 0 1 1 ${X-1} ${cy+9}`:`M ${X+10} ${cy-3} A 10 10 0 1 0 ${X+1} ${cy+9}`;
+    return `<path d="${d}" fill="none" stroke="#7d76a0" stroke-width="2.4" stroke-linecap="round"${A}/>`;};
+  switch(kind){
+    case "anchor": return P(`M ${X} 66 q 22 40 0 74`)+`<text x="${X+15}" y="150" font-size="8" fill="#8a83a3">stays</text>`;
+    case "inback": return P(`M ${X-8} 58 C ${X-34} 106 ${X-28} 152 ${X} 152 C ${X+28} 152 ${X+34} 106 ${X+8} 60`);
+    case "inbackTurn": return P(`M ${X-8} 58 C ${X-32} 102 ${X-26} 148 ${X} 148`)+spin(150,true);
+    case "inbackRotate": return P(`M ${X-8} 58 C ${X-32} 102 ${X-26} 148 ${X} 148`)+spin(150,false);
+    case "down": return P(`M ${X} 56 L ${X} ${LBOT}`);
+    case "downR": return P(`M ${X} 56 C ${X+16} 130 ${X+16} 170 ${X} ${LBOT}`);
+    case "downTurnCW": return P(`M ${X} 56 L ${X} 138`)+spin(158,true)+P(`M ${X} 184 L ${X} ${LBOT}`);
+    case "downTurnCCW": return P(`M ${X} 56 L ${X} 138`)+spin(158,false)+P(`M ${X} 184 L ${X} ${LBOT}`);
+    case "downLeadTurn": return P(`M ${X} 56 L ${X} ${LBOT}`)+spin(150,false)+`<text x="${X+13}" y="150" font-size="7.4" fill="#8a83a3">you turn</text>`;
+    case "roll": return P(`M ${X} 56 C ${X+18} 108 ${X-16} 146 ${X+12} 172 C ${X+30} 192 ${X-4} 208 ${X} ${LBOT}`);
+    case "whip": return P(`M ${X} 58 C ${X+34} 94 ${X+30} 170 ${X} 150 C ${X-24} 138 ${X-14} 92 ${X} 66`);
+    case "reverseWhip": return P(`M ${X} 58 C ${X-34} 94 ${X-30} 170 ${X} 150 C ${X+24} 138 ${X+14} 92 ${X} 66`);
+    case "whipTurn": return P(`M ${X} 58 C ${X+34} 94 ${X+30} 170 ${X} 150 C ${X-24} 138 ${X-14} 92 ${X} 66`)+spin(150,true);
+    default: return P(`M ${X} 56 L ${X} ${LBOT}`);
+  }
+}
+function diagram(m){
+  const rows=(m.travel==="anchor")?STEPS.anchor:(STEPS[m.fam]||STEPS.push);
+  return `<svg viewBox="0 0 192 244" role="img" aria-label="Foot placement diagram for ${m.name}">
+    <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="4" refY="3.2" orient="auto">
+      <path d="M0 0 L7 3.2 L0 6.4 Z" fill="#8a83a3"/></marker></defs>
+    <rect x="${LANEX-18}" y="26" width="36" height="206" rx="18" fill="#f3eefb" stroke="#e3dcf3"/>
+    <line x1="${LANEX}" y1="34" x2="${LANEX}" y2="226" stroke="#e0d8f2" stroke-width="1.4" stroke-dasharray="3 5"/>
+    <text x="${LANEX}" y="18" text-anchor="middle" font-size="7.8" font-weight="700" fill="#8a83a3">slot · follower</text>
+    ${travelPath(m.travel)}
+    ${ladder(rows)}
+  </svg>`;
+}
+
+/* ===========================================================================
+   APP STATE + RENDER
+=========================================================================== */
+const store={
+  get(){ try{return JSON.parse(localStorage.getItem("wcsLearned")||"[]")}catch(e){return[]} },
+  set(a){ try{localStorage.setItem("wcsLearned",JSON.stringify(a))}catch(e){} }
+};
+let learned=new Set(store.get());
+let filter="all";
+let order=MOVES.map((_,i)=>i);
+let pos=0;
+
+const card=document.getElementById("card");
+const front=document.getElementById("front");
+const back=document.getElementById("back");
+const spacer=document.getElementById("spacer");
+const counter=document.getElementById("counter");
+const progFill=document.getElementById("progFill");
+
+function deck(){
+  let idx=order.slice();
+  if(filter==="learned") idx=idx.filter(i=>learned.has(MOVES[i].n));
+  else if(filter!=="all") idx=idx.filter(i=>MOVES[i].level===filter);
+  return idx.length?idx:order.slice();
+}
+
+function render(){
+  const d=deck();
+  if(pos>=d.length) pos=0;
+  const m=MOVES[d[pos]];
+  const isDone=learned.has(m.n);
+  const badge=m.level==="Core"?'<span class="badge core">Core</span>':'<span class="badge plus">Beginner+</span>';
+
+  front.innerHTML=`<div class="face-inner">
+    <div class="topline"><span class="num">#${m.n}</span>${badge}<span class="fam">${m.count}</span></div>
+    <div class="name">${m.name}</div>
+    <div class="aka">${m.aka}</div>
+    <div class="timing">Timing <b>${m.timing.replace(/&/g,"&amp;")}</b></div>
+    <div class="diagram">${diagram(m)}</div>
+    <div class="foot-note"><span class="lab">Your feet (lead)</span>${m.feet}</div>
+    <div class="hint">Tap to flip for <b>hands · lead cues · video</b></div>
+  </div>`;
+
+  back.innerHTML=`<div class="face-inner">
+    <div class="topline"><span class="num">#${m.n}</span>${badge}<span class="fam">${m.name}</span></div>
+    <div class="sec"><div class="lab">✋ Hands &amp; connection</div><p>${m.hands}</p></div>
+    <div class="sec"><div class="lab">🧠 Remember</div><div class="cue">${m.cue}</div></div>
+    <div class="links">
+      <a class="btn vid" href="${m.vid}" target="_blank" rel="noopener"><span class="ic">▶</span><span>Watch tutorial<small>${m.vidT}</small></span></a>
+      <a class="btn ref" href="${m.ref}" target="_blank" rel="noopener"><span class="ic">↗</span><span>Reference<small>${m.refT}</small></span></a>
+      <button class="learn ${isDone?'done':''}" id="learnBtn">${isDone?'★ Learned':'☆ Mark as learned'}</button>
+    </div>
+  </div>`;
+
+  spacer.innerHTML=front.innerHTML;
+  requestAnimationFrame(()=>{ spacer.style.height=Math.max(front.scrollHeight, back.scrollHeight)+"px"; });
+
+  document.getElementById("learnBtn").addEventListener("click",(e)=>{
+    e.stopPropagation();
+    if(learned.has(m.n)) learned.delete(m.n); else learned.add(m.n);
+    store.set([...learned]); render();
+  });
+
+  counter.textContent=`${pos+1} / ${d.length}`;
+  progFill.style.width=(learned.size/MOVES.length*100)+"%";
+}
+function flip(){ card.classList.toggle("flipped"); }
+function go(dir){ const d=deck(); pos=(pos+dir+d.length)%d.length; card.classList.remove("flipped"); render(); }
+
+card.addEventListener("click",flip);
+document.getElementById("flipBtn").addEventListener("click",(e)=>{e.stopPropagation();flip();});
+document.getElementById("prevBtn").addEventListener("click",()=>go(-1));
+document.getElementById("nextBtn").addEventListener("click",()=>go(1));
+document.getElementById("shuffleBtn").addEventListener("click",()=>{
+  for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+  pos=0; card.classList.remove("flipped"); render();
+});
+document.querySelectorAll("[data-filter]").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("[data-filter]").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on"); filter=b.dataset.filter; pos=0; card.classList.remove("flipped"); render();
+  });
+});
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="ArrowRight")go(1);
+  else if(e.key==="ArrowLeft")go(-1);
+  else if(e.key===" "||e.key==="Enter"){e.preventDefault();flip();}
+});
+let sx=0,sy=0;
+card.addEventListener("touchstart",e=>{const t=e.changedTouches[0];sx=t.clientX;sy=t.clientY;},{passive:true});
+card.addEventListener("touchend",e=>{
+  const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){ if(dx<0)go(1); else go(-1); }
+});
+
+render();
+window.addEventListener("resize",()=>{ spacer.style.height=Math.max(front.scrollHeight,back.scrollHeight)+"px"; });
+</script>
+<div id="installHint" style="display:none;position:fixed;left:10px;right:10px;bottom:12px;max-width:440px;margin:auto;background:#2a1857;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:11px 12px;font-size:.8rem;box-shadow:0 12px 30px rgba(0,0,0,.45);z-index:50;align-items:center;gap:10px">
+  <span id="installMsg" style="flex:1"></span>
+  <button id="installBtn" style="display:none;border:none;background:#ffd166;color:#3a1c71;font-weight:800;padding:8px 12px;border-radius:10px">Install</button>
+  <button id="installClose" aria-label="Dismiss" style="border:none;background:transparent;color:#cbb7ff;font-size:1.15rem;font-weight:800;line-height:1">&times;</button>
+</div>
+<script>
+(function(){
+  if("serviceWorker" in navigator){ window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
+  var hint=document.getElementById("installHint"),msg=document.getElementById("installMsg"),btn=document.getElementById("installBtn"),close=document.getElementById("installClose");
+  var dismissed=false; try{dismissed=localStorage.getItem("wcsInstallDismiss")==="1";}catch(e){}
+  var standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
+  function show(t,showBtn){ if(dismissed||standalone)return; msg.textContent=t; btn.style.display=showBtn?"block":"none"; hint.style.display="flex"; }
+  close.addEventListener("click",function(){hint.style.display="none";try{localStorage.setItem("wcsInstallDismiss","1");}catch(e){}});
+  var deferred=null;
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;show("Install WCS Cards to your home screen.",true);});
+  btn.addEventListener("click",function(){ if(!deferred)return; deferred.prompt(); deferred.userChoice.then(function(){deferred=null;hint.style.display="none";}); });
+  var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent), isSafari=/^((?!chrome|crios|fxios).)*safari/i.test(navigator.userAgent);
+  if(isIOS&&isSafari&&!standalone){ setTimeout(function(){ show("Install: tap the Share icon, then Add to Home Screen.",false); },1200); }
+})();
+</script>
+</body>
+</html>
